@@ -421,7 +421,10 @@
   (let [*repl-states (atom {:cnt 0})
         user-dir (System/getProperty "user.dir")
         analyzer-dir (ensure-cljd-analyzer!)]
-    (exec {:in nil :out nil} (some-> *deps* :cljd/opts :kind name) "pub" "get")
+    ;; A synchronous child cannot finish if its unread stdout pipe fills.
+    ;; Use platform null devices rather than Redirect/DISCARD (Java 9+).
+    (exec {:in nil :out (io/file (if (.startsWith (System/getProperty "os.name") "Windows") "NUL" "/dev/null"))}
+      (some-> *deps* :cljd/opts :kind name) "pub" "get")
     (with-taps
       [(fn [x]
          (case (::compiler/msg-kind x)

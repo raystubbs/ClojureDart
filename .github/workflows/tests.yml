@@ -26,6 +26,9 @@ jobs:
       - name: Test compiler subprocess handling
         run: clojure -M -m cljd.process-test
 
+      - name: Test FVM command selection
+        run: clojure -M -m cljd.fvm-test
+
   testing-on-dart-stable:
 
     strategy:
